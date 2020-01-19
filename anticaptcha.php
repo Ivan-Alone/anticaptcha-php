@@ -15,6 +15,7 @@ class Anticaptcha {
     private $verboseMode = false;
     private $errorMessage;
     private $taskId;
+    private $unsafe;
     public $taskInfo;
     
     
@@ -45,6 +46,10 @@ class Anticaptcha {
             return false;
         }
         
+    }
+    
+    public function setSSLUnsafeAllowed(bool $unsafe) {
+        $this->unsafe = $unsafe;
     }
     
     public function waitForResult($maxSeconds = 300, $currentSecond = 0) {
@@ -117,6 +122,10 @@ class Anticaptcha {
         
         
         $ch = curl_init();
+        if ($this->unsafe) {
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); 
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        }
         curl_setopt($ch,CURLOPT_URL,"{$this->scheme}://{$this->host}/$methodName");
         curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
         curl_setopt($ch,CURLOPT_ENCODING,"gzip,deflate");
